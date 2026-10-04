@@ -1,16 +1,7 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { projects, catalogMeta } from '../data/catalog';
 
 export default function Home() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const faqs = [
-    { q: 'Почему вы используете латунь Л63, а не ЦАМ?', a: 'Латунь Л63 по ГОСТ 17711-93 имеет историческую преемственность с оригинальными изделиями XIX–XX вв. ЦАМ не соответствует нормативам КГИОП.' },
-    { q: 'Как происходит согласование с КГИОП?', a: 'Мы готовим полный пакет: задание на проектирование, историко-архивную справку, обмерные чертежи, проект реставрации. Стандартный срок — 30 рабочих дней.' },
-    { q: 'Что входит в паспорт сплава?', a: 'Марка сплава, химический состав (%), результаты спектрометрического анализа, номер плавки, дата производства, протокол патинирования.' },
-    { q: 'Можно ли изготовить фурнитуру без исторического прототипа?', a: 'Мы работаем только с объектами культурного наследия. Требуется архивный источник или сохранившийся образец.' },
-  ];
-
   return (
     <div>
       <section className="relative overflow-hidden" style={{ backgroundColor: 'var(--c-void)', minHeight: '60vh' }}>
@@ -123,35 +114,6 @@ export default function Home() {
                 <p className="text-sm font-light" style={{ color: 'var(--c-ash)' }}>{project.address}</p>
               </Link>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-32 md:py-40" style={{ backgroundColor: 'var(--c-charcoal)' }}>
-        <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-            <div className="lg:col-span-5">
-              <div className="sticky top-32">
-                <p className="label-gold mb-4">Частые вопросы</p>
-                <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-8" style={{ fontFamily: 'var(--f-display)', color: 'var(--c-parchment)' }}>Технические детали</h2>
-                <div className="aspect-[4/5] overflow-hidden" style={{ backgroundColor: 'var(--c-iron)' }}>
-                  <img src="https://image.qwenlm.ai/generated-images/1066f941-8261-447d-ae26-ddf36b7e1a83/_result.png" alt="Документация" className="w-full h-full object-cover" loading="lazy" />
-                </div>
-              </div>
-            </div>
-            <div className="lg:col-span-7">
-              <div className="space-y-0">
-                {faqs.map((faq, i) => (
-                  <div key={i} style={{ borderBottom: '1px solid var(--c-rule-light)' }}>
-                    <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex justify-between items-center py-8 text-left group" aria-expanded={openFaq === i}>
-                      <span className="text-base font-medium group-hover:text-[var(--c-gold)] transition-colors pr-4">{faq.q}</span>
-                      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" className={`shrink-0 transition-transform ${openFaq === i ? 'rotate-180' : ''}`} style={{ color: 'var(--c-gold)' }}><path d="M19 9l-7 7-7-7" /></svg>
-                    </button>
-                    {openFaq === i && (<div className="pb-8 text-sm leading-relaxed font-light" style={{ color: 'var(--c-ash)' }}>{faq.a}</div>)}
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </section>
