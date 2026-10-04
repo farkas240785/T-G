@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { products, CatalogProduct } from '../data/catalog';
 
 export default function Header() {
@@ -8,6 +9,8 @@ export default function Header() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CatalogProduct[]>([]);
   const folderCount = JSON.parse(localStorage.getItem('tg_project_folder') || '{"items":[]}').items?.length || 0;
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (query.length >= 2) {
@@ -17,7 +20,19 @@ export default function Header() {
 
   useEffect(() => { document.body.style.overflow = menuOpen ? 'hidden' : ''; return () => { document.body.style.overflow = ''; }; }, [menuOpen]);
 
-  const nav = [{ to: '/catalog', label: 'Каталог' }, { to: '/projects', label: 'Проекты' }, { to: '/about', label: 'Мануфактура' }, { to: '/docs', label: 'Нормативы' }, { to: '/order', label: 'Расчёт' }, { to: '/contacts', label: 'Контакты' }, { to: '/dashboard', label: 'Личный кабинет' }];
+  const nav = [
+    { to: '/catalog', label: 'Каталог' },
+    { to: '/projects', label: 'Проекты' },
+    { to: '/about', label: 'Мануфактура' },
+    { to: '/docs', label: 'Нормативы' },
+    { to: '/order', label: 'Расчёт' },
+    { to: '/contacts', label: 'Контакты' },
+  ];
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <>
@@ -49,6 +64,23 @@ export default function Header() {
                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" /></svg>
                 {folderCount > 0 && (<span className="absolute -top-1 -right-1 w-4 h-4 text-[10px] font-bold flex items-center justify-center rounded-full" style={{ backgroundColor: 'var(--c-gold)', color: 'var(--c-coal)' }}>{folderCount}</span>)}
               </Link>
+              
+              {/* Auth buttons */}
+              {isAuthenticated ? (
+                <div className="hidden lg:flex items-center gap-4">
+                  <Link to="/dashboard" className="text-sm font-light hover:text-[var(--c-gold-rich)] transition-colors" style={{ color: 'var(--c-ash)' }}>
+                    {user?.name.split(' ')[0]}
+                  </Link>
+                  <button onClick={handleLogout} className="text-xs font-light hover:text-[var(--c-gold-rich)] transition-colors" style={{ color: 'var(--c-smoke)' }}>
+                    Выйти
+                  </button>
+                </div>
+              ) : (
+                <Link to="/login" className="hidden lg:inline-block text-sm font-light hover:text-[var(--c-gold-rich)] transition-colors" style={{ color: 'var(--c-ash)' }}>
+                  Войти
+                </Link>
+              )}
+              
               <button className="lg:hidden p-2" onClick={() => setMenuOpen(!menuOpen)} aria-label="Меню">
                 <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">{menuOpen ? <><path d="M18 6 6 18" /><path d="m6 6 12 12" /></> : <><path d="M4 8h16" /><path d="M4 16h16" /></>}</svg>
               </button>
@@ -78,6 +110,33 @@ export default function Header() {
             <p className="label-gold mb-10">Навигация</p>
             <nav aria-label="Мобильная навигация">
               {nav.map((item, i) => (<Link key={item.to} to={item.to} onClick={() => setMenuOpen(false)} className="flex items-baseline gap-6 py-6 group" style={{ borderBottom: '1px solid var(--c-rule-light)' }}><span className="font-mono text-xs" style={{ color: 'var(--c-gold)' }}>0{i + 1}</span><span className="text-3xl font-medium group-hover:text-[var(--c-gold)] transition-colors" style={{ fontFamily: 'var(--f-display)' }}>{item.label}</span></Link>))}
+              
+              {/* Mobile auth */}
+              <div className="mt-8 pt-8" style={{ borderTop: '1px solid var(--c-rule-light)' }}>
+                {isAuthenticated ? (
+                  <>
+                    <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="flex items-baseline gap-6 py-6 group" style={{ borderBottom: '1px solid var(--c-rule-light)' }}>
+                      <span className="font-mono text-xs" style={{ color: 'var(--c-gold)' }}>07</span>
+                      <span className="text-3xl font-medium group-hover:text-[var(--c-gold)] transition-colors" style={{ fontFamily: 'var(--f-display)' }}>Личный кабинет</span>
+                    </Link>
+                    <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="flex items-baseline gap-6 py-6 group w-full text-left" style={{ borderBottom: '1px solid var(--c-rule-light)' }}>
+                      <span className="font-mono text-xs" style={{ color: 'var(--c-gold)' }}>08</span>
+                      <span className="text-3xl font-medium group-hover:text-[var(--c-gold)] transition-colors" style={{ fontFamily: 'var(--f-display)' }}>Выйти</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" onClick={() => setMenuOpen(false)} className="flex items-baseline gap-6 py-6 group" style={{ borderBottom: '1px solid var(--c-rule-light)' }}>
+                      <span className="font-mono text-xs" style={{ color: 'var(--c-gold)' }}>07</span>
+                      <span className="text-3xl font-medium group-hover:text-[var(--c-gold)] transition-colors" style={{ fontFamily: 'var(--f-display)' }}>Войти</span>
+                    </Link>
+                    <Link to="/register" onClick={() => setMenuOpen(false)} className="flex items-baseline gap-6 py-6 group" style={{ borderBottom: '1px solid var(--c-rule-light)' }}>
+                      <span className="font-mono text-xs" style={{ color: 'var(--c-gold)' }}>08</span>
+                      <span className="text-3xl font-medium group-hover:text-[var(--c-gold)] transition-colors" style={{ fontFamily: 'var(--f-display)' }}>Регистрация</span>
+                    </Link>
+                  </>
+                )}
+              </div>
             </nav>
           </div>
         </div>

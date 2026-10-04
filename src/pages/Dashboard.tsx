@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
-import { currentUser, mockOrders, formatCurrency, formatDate } from '../data/dashboard';
+import { useAuth } from '../context/AuthContext';
+import { mockOrders, formatCurrency, formatDate } from '../data/dashboard';
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  
   const getStageProgress = (stages: any[]) => {
     const completed = stages.filter(s => s.status === 'completed').length;
     return Math.round((completed / stages.length) * 100);
@@ -9,6 +12,16 @@ export default function Dashboard() {
 
   const getPaymentProgress = (paid: number, total: number) => {
     return Math.round((paid / total) * 100);
+  };
+
+  const getRoleName = (role: string) => {
+    switch (role) {
+      case 'architect': return 'ГИП / Архитектор';
+      case 'customer': return 'Заказчик';
+      case 'technologist': return 'Технолог';
+      case 'manager': return 'Менеджер';
+      default: return 'Пользователь';
+    }
   };
 
   return (
@@ -24,10 +37,10 @@ export default function Dashboard() {
           </nav>
           <p className="label-gold mb-4">Добро пожаловать</p>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-none mb-4" style={{ fontFamily: 'var(--f-display)', color: 'var(--c-parchment)' }}>
-            {currentUser.name}
+            {user?.name}
           </h1>
           <p className="text-base font-light" style={{ color: 'var(--c-ash)' }}>
-            {currentUser.company} · {currentUser.role === 'architect' ? 'ГИП / Архитектор' : currentUser.role === 'customer' ? 'Заказчик' : 'Сотрудник'}
+            {user?.company} · {getRoleName(user?.role || '')}
           </p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-1 forge-gradient"></div>
