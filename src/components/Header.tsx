@@ -17,7 +17,7 @@ export default function Header() {
 
   useEffect(() => { document.body.style.overflow = menuOpen ? 'hidden' : ''; return () => { document.body.style.overflow = ''; }; }, [menuOpen]);
 
-  const nav = [{ to: '/catalog', label: 'Каталог' }, { to: '/projects', label: 'Проекты' }, { to: '/about', label: 'Мануфактура' }, { to: '/docs', label: 'Нормативы' }, { to: '/order', label: 'Расчёт' }, { to: '/contacts', label: 'Контакты' }];
+  const nav = [{ to: '/catalog', label: 'Каталог' }, { to: '/projects', label: 'Проекты' }, { to: '/about', label: 'Мануфактура' }, { to: '/docs', label: 'Нормативы' }, { to: '/order', label: 'Расчёт' }, { to: '/contacts', label: 'Контакты' }, { to: '/dashboard', label: 'Личный кабинет' }];
 
   return (
     <>

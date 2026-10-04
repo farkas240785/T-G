@@ -16,7 +16,7 @@ export default function Footer() {
           </div>
           <div className="md:col-span-3">
             <p className="label-gold mb-6" style={{ color: 'var(--c-gold)' }}>Навигация</p>
-            <ul className="space-y-3">{[{ to: '/catalog', label: 'Каталог изделий' }, { to: '/projects', label: 'Проекты' }, { to: '/about', label: 'Мануфактура' }, { to: '/docs', label: 'Нормативная база' }, { to: '/order', label: 'Расчёт по проекту' }, { to: '/contacts', label: 'Контакты' }].map(i => (<li key={i.to}><Link to={i.to} className="text-sm font-light hover:text-[var(--c-gold-rich)] transition-colors" style={{ color: 'var(--c-ash)' }}>{i.label}</Link></li>))}</ul>
+            <ul className="space-y-3">{[{ to: '/catalog', label: 'Каталог изделий' }, { to: '/projects', label: 'Проекты' }, { to: '/about', label: 'Мануфактура' }, { to: '/docs', label: 'Нормативная база' }, { to: '/order', label: 'Расчёт по проекту' }, { to: '/contacts', label: 'Контакты' }, { to: '/dashboard', label: 'Личный кабинет' }].map(i => (<li key={i.to}><Link to={i.to} className="text-sm font-light hover:text-[var(--c-gold-rich)] transition-colors" style={{ color: 'var(--c-ash)' }}>{i.label}</Link></li>))}</ul>
           </div>
           <div className="md:col-span-2">
             <p className="label-gold mb-6" style={{ color: 'var(--c-gold)' }}>Нормативы</p>

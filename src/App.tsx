@@ -11,6 +11,11 @@ import Order from './pages/Order';
 import About from './pages/About';
 import Contacts from './pages/Contacts';
 import Folder from './pages/Folder';
+import Dashboard from './pages/Dashboard';
+import OrderTracker from './pages/OrderTracker';
+import Configurator from './pages/Configurator';
+import ObjectFolder from './pages/ObjectFolder';
+import Finance from './pages/Finance';
 
 function App() {
   return (
@@ -28,6 +33,11 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/contacts" element={<Contacts />} />
             <Route path="/folder" element={<Folder />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard/order/:id" element={<OrderTracker />} />
+            <Route path="/dashboard/configurator" element={<Configurator />} />
+            <Route path="/dashboard/object-folder" element={<ObjectFolder />} />
+            <Route path="/dashboard/finance" element={<Finance />} />
           </Routes>
         </main>
         <Footer />
