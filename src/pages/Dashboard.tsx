@@ -194,6 +194,17 @@ export default function Dashboard() {
                 Счета, УПД, история платежей. Поэтапная оплата 30% → 40% → 30%.
               </p>
             </Link>
+            {(user?.role === 'manager' || user?.role === 'technologist') && (
+              <Link to="/dashboard/cms" className="card-dark p-8 group">
+                <div className="text-4xl mb-4">⚙️</div>
+                <h3 className="text-xl font-semibold mb-3 group-hover:text-[var(--c-gold)] transition-colors" style={{ fontFamily: 'var(--f-display)' }}>
+                  CMS
+                </h3>
+                <p className="text-sm" style={{ color: 'var(--c-ash)' }}>
+                  Система управления заказами. Диаграмма Ганта, контроль производства.
+                </p>
+              </Link>
+            )}
           </div>
         </div>
       </section>

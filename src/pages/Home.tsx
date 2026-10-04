@@ -83,15 +83,25 @@ export default function Home() {
             <Link to="/catalog" className="link-forge hidden md:inline-block">Весь каталог →</Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Object.entries(catalogMeta.types).slice(0, 6).map(([key, label]) => (
-              <Link key={key} to={`/catalog?type=${key}`} className="group card-dark overflow-hidden">
-                <div className="aspect-[4/3] overflow-hidden relative">
-                  <img src={`https://placehold.co/600x450/1A1714/E8923A?text=${encodeURIComponent(label)}`} alt={label} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[var(--c-coal)] via-transparent to-transparent opacity-80"></div>
-                </div>
-                <div className="p-6"><h3 className="text-xl font-semibold mb-3 group-hover:text-[var(--c-gold)] transition-colors" style={{ fontFamily: 'var(--f-display)' }}>{label}</h3><span className="link-forge">Смотреть →</span></div>
-              </Link>
-            ))}
+            {Object.entries(catalogMeta.types).slice(0, 6).map(([key, label], index) => {
+              const categoryImages = [
+                'https://image.qwenlm.ai/generated-images/fe2ad1d2-62b1-4d94-a9b8-ec881971d7a6/_result.png',
+                'https://image.qwenlm.ai/generated-images/cbfd88a0-f4d1-4876-89c0-3b893cd8271b/_result.png',
+                'https://image.qwenlm.ai/generated-images/32719f54-1100-4a15-96af-70529b0ea99a/_result.png',
+                'https://image.qwenlm.ai/generated-images/e9954b1b-bfe7-4c37-8e88-3d2b071323b6/_result.png',
+                'https://image.qwenlm.ai/generated-images/13c025e2-34fb-4594-a8b9-d93d3d57d966/_result.png',
+                'https://image.qwenlm.ai/generated-images/6927b184-7704-4d6c-b13a-a97610f7800f/_result.png'
+              ];
+              return (
+                <Link key={key} to={`/catalog?type=${key}`} className="group card-dark overflow-hidden">
+                  <div className="aspect-[4/3] overflow-hidden relative">
+                    <img src={categoryImages[index]} alt={label} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--c-coal)] via-transparent to-transparent opacity-80"></div>
+                  </div>
+                  <div className="p-6"><h3 className="text-xl font-semibold mb-3 group-hover:text-[var(--c-gold)] transition-colors" style={{ fontFamily: 'var(--f-display)' }}>{label}</h3><span className="link-forge">Смотреть →</span></div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -123,7 +133,7 @@ export default function Home() {
         <div className="container relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="aspect-[4/3] overflow-hidden" style={{ backgroundColor: 'var(--c-iron)' }}>
-              <img src="https://image.qwenlm.ai/generated-images/ea08fc15-5395-42fb-9666-dea015ad33a5/_result.png" alt="Обсуждение проекта" className="w-full h-full object-cover" loading="lazy" />
+              <img src="https://image.qwenlm.ai/generated-images/6e4a6735-b04b-4517-b74a-29ad71093388/_result.png" alt="Обсуждение проекта" className="w-full h-full object-cover" loading="lazy" />
             </div>
             <div>
               <p className="label-gold mb-6">Начать работу</p>

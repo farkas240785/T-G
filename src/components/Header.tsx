@@ -43,9 +43,15 @@ export default function Header() {
             <Link to="/" className="flex items-center gap-4 shrink-0 group">
               <div className="relative w-11 h-11">
                 <svg viewBox="0 0 44 44" fill="none" className="w-full h-full">
-                  <path d="M12 18C12 18 10 30 14 34C18 38 26 38 30 34C34 30 32 18 32 18" stroke="var(--c-gold)" strokeWidth="1.5" fill="none"/>
-                  <path d="M22 8C22 8 18 14 20 18C22 22 24 18 24 18C24 18 26 14 22 8Z" fill="var(--c-gold-rich)" opacity="0.9"/>
-                  <line x1="14" y1="36" x2="30" y2="36" stroke="var(--c-brass)" strokeWidth="1.5"/>
+                  {/* Тигель - чаша для плавки */}
+                  <path d="M10 20C10 20 9 28 12 32C15 36 29 36 32 32C35 28 34 20 34 20" stroke="var(--c-gold)" strokeWidth="2" fill="none"/>
+                  <ellipse cx="22" cy="20" rx="12" ry="3" stroke="var(--c-gold)" strokeWidth="1.5" fill="none"/>
+                  {/* Пламя */}
+                  <path d="M22 8C22 8 18 14 20 18C22 22 24 18 24 18C24 18 26 14 22 8Z" fill="var(--c-gold-rich)"/>
+                  <path d="M22 12C22 12 20 16 21 18C22 20 23 18 23 18C23 18 24 16 22 12Z" fill="var(--c-gold-light)"/>
+                  {/* Горн - основание */}
+                  <rect x="8" y="36" width="28" height="2" fill="var(--c-brass)"/>
+                  <path d="M12 36L10 38M32 36L34 38" stroke="var(--c-brass)" strokeWidth="1.5"/>
                 </svg>
               </div>
               <div>

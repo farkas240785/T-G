@@ -13,6 +13,17 @@ type QuickAction = {
   query: string;
 };
 
+type AnamnesisData = {
+  projectType?: string;
+  objectName?: string;
+  epoch?: string;
+  material?: string;
+  quantity?: string;
+  deadline?: string;
+  budget?: string;
+  contactInfo?: string;
+};
+
 const QUICK_ACTIONS: QuickAction[] = [
   { label: 'Подобрать изделие', query: 'Подобрать изделие' },
   { label: 'Вопрос по ГОСТу', query: 'Какие ГОСТы вы используете?' },
@@ -20,24 +31,114 @@ const QUICK_ACTIONS: QuickAction[] = [
   { label: 'Сроки изготовления', query: 'Какие сроки изготовления?' },
 ];
 
+// Контекст диалога для сбора анамнеза
+let conversationContext: AnamnesisData = {};
+let conversationStep = 0;
+
 function generateResponse(input: string): React.ReactNode {
   const q = input.toLowerCase();
 
-  if (q.includes('подобрать') || q.includes('подбор') || q.includes('какие изделия')) {
-    const types = Object.entries(catalogMeta.types).map(([key, label]) => (
-      <li key={key} style={{ marginBottom: 4 }}>
-        <Link to={`/catalog?type=${key}`} style={{ color: 'var(--c-gold)' }}>→ {label}</Link>
-      </li>
-    ));
+  // Сбор анамнеза - пошаговый диалог
+  if (conversationStep === 0 && (q.includes('подобрать') || q.includes('подбор') || q.includes('начать') || q.includes('проект'))) {
+    conversationStep = 1;
     return (
       <>
-        <p style={{ marginBottom: 8 }}>В нашем каталоге представлены следующие типы фурнитуры:</p>
-        <ul style={{ paddingLeft: 16 }}>{types}</ul>
-        <p style={{ marginTop: 8 }}>Уточните, что именно вас интересует — эпоха, материал, тип изделия — и я помогу подобрать конкретные позиции.</p>
+        <p>Отлично! Помогу подобрать изделие для вашего проекта. Для начала расскажите:</p>
+        <p className="mt-2 font-medium" style={{ color: 'var(--c-gold)' }}>Какой тип объекта вы реставрируете?</p>
+        <p className="mt-1 text-xs" style={{ color: 'var(--c-ash)' }}>(Храм, усадьба, музей, особняк, доходный дом и т.д.)</p>
       </>
     );
   }
 
+  if (conversationStep === 1) {
+    conversationContext.projectType = input;
+    conversationStep = 2;
+    return (
+      <>
+        <p>Понял, {input}. Отличный выбор!</p>
+        <p className="mt-2 font-medium" style={{ color: 'var(--c-gold)' }}>Какой исторический период или стиль?</p>
+        <p className="mt-1 text-xs" style={{ color: 'var(--c-ash)' }}>(Петровское барокко, елизаветинское барокко, классицизм, ампир, эклектика, модерн и т.д.)</p>
+      </>
+    );
+  }
+
+  if (conversationStep === 2) {
+    conversationContext.epoch = input;
+    conversationStep = 3;
+    return (
+      <>
+        <p>{input} — прекрасный период! У нас есть опыт работы с этой эпохой.</p>
+        <p className="mt-2 font-medium" style={{ color: 'var(--c-gold)' }}>Какой тип фурнитуры вас интересует?</p>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          {Object.entries(catalogMeta.types).slice(0, 6).map(([key, label]) => (
+            <div key={key} className="p-2 text-xs" style={{ backgroundColor: 'var(--c-iron)', borderRadius: '4px' }}>
+              • {label}
+            </div>
+          ))}
+        </div>
+      </>
+    );
+  }
+
+  if (conversationStep === 3) {
+    conversationContext.material = input;
+    conversationStep = 4;
+    return (
+      <>
+        <p>Отлично! Подберу подходящие варианты.</p>
+        <p className="mt-2 font-medium" style={{ color: 'var(--c-gold)' }}>Какое примерное количество изделий необходимо?</p>
+      </>
+    );
+  }
+
+  if (conversationStep === 4) {
+    conversationContext.quantity = input;
+    conversationStep = 5;
+    return (
+      <>
+        <p>Принял. Какой ориентировочный срок изготовления?</p>
+        <p className="mt-1 text-xs" style={{ color: 'var(--c-ash)' }}>(Минимальный срок — 30 дней с момента согласования)</p>
+      </>
+    );
+  }
+
+  if (conversationStep === 5) {
+    conversationContext.deadline = input;
+    conversationStep = 6;
+    return (
+      <>
+        <p>Понял. И последний вопрос:</p>
+        <p className="mt-2 font-medium" style={{ color: 'var(--c-gold)' }}>Как с вами связаться для подготовки коммерческого предложения?</p>
+        <p className="mt-1 text-xs" style={{ color: 'var(--c-ash)' }}>(Email или телефон)</p>
+      </>
+    );
+  }
+
+  if (conversationStep === 6) {
+    conversationContext.contactInfo = input;
+    conversationStep = 0; // Сброс для нового диалога
+    
+    const anamnesis = conversationContext;
+    conversationContext = {}; // Очистка
+    
+    return (
+      <>
+        <p>Спасибо! Собрал информацию о вашем проекте:</p>
+        <div className="mt-3 p-4" style={{ backgroundColor: 'var(--c-iron)', borderRadius: '4px' }}>
+          <p className="text-xs mb-2"><strong style={{ color: 'var(--c-gold)' }}>Тип объекта:</strong> {anamnesis.projectType}</p>
+          <p className="text-xs mb-2"><strong style={{ color: 'var(--c-gold)' }}>Эпоха:</strong> {anamnesis.epoch}</p>
+          <p className="text-xs mb-2"><strong style={{ color: 'var(--c-gold)' }}>Тип фурнитуры:</strong> {anamnesis.material}</p>
+          <p className="text-xs mb-2"><strong style={{ color: 'var(--c-gold)' }}>Количество:</strong> {anamnesis.quantity}</p>
+          <p className="text-xs mb-2"><strong style={{ color: 'var(--c-gold)' }}>Срок:</strong> {anamnesis.deadline}</p>
+          <p className="text-xs"><strong style={{ color: 'var(--c-gold)' }}>Контакты:</strong> {anamnesis.contactInfo}</p>
+        </div>
+        <p className="mt-3">Наш технолог подготовит коммерческое предложение и свяжется с вами в течение рабочего дня.</p>
+        <p className="mt-2">А пока могу показать подходящие изделия из каталога или ответить на вопросы по нормативам КГИОП.</p>
+      </>
+    );
+  }
+
+  // Стандартные ответы на вопросы
   if (q.includes('ручк') || q.includes('скоб') || q.includes('кноб')) {
     const handles = products.filter(p => p.type === 'handles').slice(0, 3);
     return (
@@ -198,6 +299,7 @@ function generateResponse(input: string): React.ReactNode {
   }
 
   if (q.includes('привет') || q.includes('здравств') || q.includes('добр')) {
+    conversationStep = 0;
     return (
       <>
         <p>Здравствуйте! Рад помочь вам с подбором реставрационной фурнитуры.</p>
@@ -209,7 +311,7 @@ function generateResponse(input: string): React.ReactNode {
           <li>Материалам и сплавам</li>
           <li>Срокам изготовления</li>
         </ul>
-        <p style={{ marginTop: 8 }}>Что вас интересует?</p>
+        <p style={{ marginTop: 8 }}>Или помогу подобрать изделие для вашего проекта — просто напишите "подобрать изделие".</p>
       </>
     );
   }
@@ -228,6 +330,7 @@ function generateResponse(input: string): React.ReactNode {
         <li>Материалами и сплавами</li>
         <li>Сроками изготовления</li>
       </ul>
+      <p style={{ marginTop: 8 }}>Или начните подбор изделия для вашего проекта — напишите "подобрать изделие".</p>
       <p style={{ marginTop: 8 }}>Уточните вопрос, или <Link to="/contacts" style={{ color: 'var(--c-gold)' }}>свяжитесь с менеджером</Link> напрямую.</p>
     </>
   );

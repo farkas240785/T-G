@@ -15,11 +15,13 @@ import Contacts from './pages/Contacts';
 import Folder from './pages/Folder';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Terms from './pages/Terms';
 import Dashboard from './pages/Dashboard';
 import OrderTracker from './pages/OrderTracker';
 import Configurator from './pages/Configurator';
 import ObjectFolder from './pages/ObjectFolder';
 import Finance from './pages/Finance';
+import CMS from './pages/CMS';
 
 function App() {
   return (
@@ -39,9 +41,9 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/folder" element={<Folder />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/terms" element={<Terms />} />
               {/* Защищённые маршруты личного кабинета */}
               <Route path="/dashboard" element={
                 <ProtectedRoute>
@@ -63,12 +65,16 @@ function App() {
                   <ObjectFolder />
                 </ProtectedRoute>
               } />
-              <Route path="/dashboard/finance" element={
-                <ProtectedRoute>
-                  <Finance />
-                </ProtectedRoute>
-              } />
-            </Routes>
+            <Route path="/dashboard/finance" element={
+              <ProtectedRoute>
+                <Finance />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/cms" element={
+              <ProtectedRoute>
+                <CMS />
+              </ProtectedRoute>
+            } />            </Routes>
           </main>
           <Footer />
           <AIAssistant />

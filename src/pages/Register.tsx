@@ -238,7 +238,7 @@ export default function Register() {
             />
             <label htmlFor="agreement" className="text-sm" style={{ color: 'var(--c-ash)' }}>
               Я согласен на обработку персональных данных в соответствии с ФЗ-152 и принимаю условия{' '}
-              <a href="#" className="link-forge">пользовательского соглашения</a>
+              <Link to="/terms" className="link-forge">пользовательского соглашения</Link>
             </label>
           </div>
 
