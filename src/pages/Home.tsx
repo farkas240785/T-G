@@ -133,7 +133,7 @@ export default function Home() {
         <div className="container relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="aspect-[4/3] overflow-hidden" style={{ backgroundColor: 'var(--c-iron)' }}>
-              <img src="https://image.qwenlm.ai/generated-images/35796d0e-ec01-4bc9-b1f7-6a2ed8d5cb3b/_result.png" alt="Обсуждение проекта" className="w-full h-full object-cover" loading="lazy" />
+              <img src="https://image.qwenlm.ai/generated-images/32031e7a-8064-4e0f-97d5-c8eb6ca04c2f/_result.png" alt="Обсуждение проекта" className="w-full h-full object-cover" loading="lazy" />
             </div>
             <div>
               <p className="label-gold mb-6">Начать работу</p>
