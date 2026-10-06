@@ -13,146 +13,209 @@ type QuickAction = {
   query: string;
 };
 
-type AnamnesisData = {
-  projectType?: string;
-  objectName?: string;
+type ConversationContext = {
+  clientType?: 'architect' | 'customer' | 'restorer' | 'unknown';
+  projectName?: string;
+  objectType?: string;
   epoch?: string;
-  material?: string;
   quantity?: string;
   deadline?: string;
   budget?: string;
   contactInfo?: string;
+  currentTopic?: string;
+  lastUserMessage?: string;
+  messageCount: number;
 };
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { label: 'Подобрать изделие', query: 'Подобрать изделие' },
-  { label: 'Вопрос по ГОСТу', query: 'Какие ГОСТы вы используете?' },
-  { label: 'Согласование КГИОП', query: 'Как происходит согласование с КГИОП?' },
-  { label: 'Сроки изготовления', query: 'Какие сроки изготовления?' },
+  { label: 'Подобрать изделие', query: 'Мне нужна помощь с подбором' },
+  { label: 'Вопрос по ГОСТу', query: 'Расскажите про нормативы' },
+  { label: 'Согласование КГИОП', query: 'Как согласовать с КГИОП?' },
+  { label: 'Сроки и стоимость', query: 'Сколько времени и денег нужно?' },
 ];
 
-// Контекст диалога для сбора анамнеза
-let conversationContext: AnamnesisData = {};
-let conversationStep = 0;
+// Глобальный контекст диалога
+let context: ConversationContext = {
+  messageCount: 0,
+};
 
+// Утилиты для естественной речи
+const greetings = [
+  'Здравствуйте! Рад вас видеть.',
+  'Добрый день! Чем могу помочь?',
+  'Здравствуйте! Слушаю вас.',
+  'Приветствую! Какой у вас проект?',
+];
+
+const acknowledgments = [
+  'Понимаю вас.',
+  'Отлично, спасибо за информацию.',
+  'Хорошо, учту это.',
+  'Принято.',
+  'Ясно, давайте разберёмся.',
+];
+
+const transitions = [
+  'Теперь давайте уточним...',
+  'Следующий важный момент...',
+  'И ещё один вопрос...',
+  'Чтобы я мог лучше помочь, расскажите...',
+];
+
+// Определение типа клиента по контексту
+function detectClientType(message: string): 'architect' | 'customer' | 'restorer' | 'unknown' {
+  const lower = message.toLowerCase();
+  if (lower.includes('гип') || lower.includes('архитектор') || lower.includes('проект') || lower.includes('чертеж')) {
+    return 'architect';
+  }
+  if (lower.includes('снабжение') || lower.includes('закупк') || lower.includes('смет') || lower.includes('бюджет')) {
+    return 'customer';
+  }
+  if (lower.includes('реставрац') || lower.includes('окн') || lower.includes('кгип') || lower.includes('памятник')) {
+    return 'restorer';
+  }
+  return 'unknown';
+}
+
+// Генерация естественного ответа
 function generateResponse(input: string): React.ReactNode {
   const q = input.toLowerCase();
+  context.messageCount++;
+  context.lastUserMessage = input;
 
-  // Сбор анамнеза - пошаговый диалог
-  if (conversationStep === 0 && (q.includes('подобрать') || q.includes('подбор') || q.includes('начать') || q.includes('проект'))) {
-    conversationStep = 1;
+  // Определяем тип клиента при первом сообщении
+  if (context.messageCount === 1) {
+    context.clientType = detectClientType(input);
+  }
+
+  // Приветствие и начало диалога
+  if (context.messageCount === 1 && (q.includes('здравств') || q.includes('привет') || q.includes('добрый'))) {
+    const greeting = greetings[Math.floor(Math.random() * greetings.length)];
     return (
       <>
-        <p>Отлично! Помогу подобрать изделие для вашего проекта. Для начала расскажите:</p>
-        <p className="mt-2 font-medium" style={{ color: 'var(--c-gold)' }}>Какой тип объекта вы реставрируете?</p>
-        <p className="mt-1 text-xs" style={{ color: 'var(--c-ash)' }}>(Храм, усадьба, музей, особняк, доходный дом и т.д.)</p>
+        <p>{greeting}</p>
+        <p className="mt-2">Меня зовут Алексей, я технолог мануфактуры «Тигель и Горн». Работаю с реставрационной фурнитурой уже 12 лет.</p>
+        <p className="mt-2">Расскажите, пожалуйста, над каким проектом вы сейчас работаете? Это поможет мне лучше понять ваши потребности.</p>
       </>
     );
   }
 
-  if (conversationStep === 1) {
-    conversationContext.projectType = input;
-    conversationStep = 2;
+  // Сбор информации о проекте
+  if (!context.objectType && (q.includes('подобр') || q.includes('помощ') || q.includes('нужн') || q.includes('хочу'))) {
     return (
       <>
-        <p>Понял, {input}. Отличный выбор!</p>
-        <p className="mt-2 font-medium" style={{ color: 'var(--c-gold)' }}>Какой исторический период или стиль?</p>
-        <p className="mt-1 text-xs" style={{ color: 'var(--c-ash)' }}>(Петровское барокко, елизаветинское барокко, классицизм, ампир, эклектика, модерн и т.д.)</p>
+        <p>{acknowledgments[Math.floor(Math.random() * acknowledgments.length)]}</p>
+        <p className="mt-2">Чтобы я мог предложить вам наиболее подходящие решения, расскажите немного о вашем объекте.</p>
+        <p className="mt-2">Это храм, усадьба, музей или другое здание? И к какому историческому периоду оно относится?</p>
       </>
     );
   }
 
-  if (conversationStep === 2) {
-    conversationContext.epoch = input;
-    conversationStep = 3;
+  if (!context.objectType && context.messageCount > 2) {
+    context.objectType = input;
     return (
       <>
-        <p>{input} — прекрасный период! У нас есть опыт работы с этой эпохой.</p>
-        <p className="mt-2 font-medium" style={{ color: 'var(--c-gold)' }}>Какой тип фурнитуры вас интересует?</p>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          {Object.entries(catalogMeta.types).slice(0, 6).map(([key, label]) => (
-            <div key={key} className="p-2 text-xs" style={{ backgroundColor: 'var(--c-iron)', borderRadius: '4px' }}>
-              • {label}
-            </div>
-          ))}
-        </div>
+        <p>{acknowledgments[Math.floor(Math.random() * acknowledgments.length)]}</p>
+        <p className="mt-2">{transitions[Math.floor(Math.random() * transitions.length)]}</p>
+        <p className="mt-2">Какой тип фурнитуры вам нужен? Мы специализируемся на дверных ручках, петлях, шпингалетах, решётках, наличниках и скобах.</p>
       </>
     );
   }
 
-  if (conversationStep === 3) {
-    conversationContext.material = input;
-    conversationStep = 4;
+  // Вопросы по ГОСТам и нормативам
+  if (q.includes('гост') || q.includes('норматив') || q.includes('стандарт')) {
     return (
       <>
-        <p>Отлично! Подберу подходящие варианты.</p>
-        <p className="mt-2 font-medium" style={{ color: 'var(--c-gold)' }}>Какое примерное количество изделий необходимо?</p>
+        <p>Отличный вопрос! Мы работаем строго в соответствии с нормативной базой.</p>
+        <p className="mt-2">Основные документы, которые мы используем:</p>
+        <ul className="mt-2 space-y-1 text-sm" style={{ paddingLeft: '20px' }}>
+          <li>• <strong>ГОСТ Р 55567-2013</strong> — реставрация памятников наследия</li>
+          <li>• <strong>Р-13.19.15</strong> — руководство по реставрации металлических конструкций</li>
+          <li>• <strong>ГОСТ 17711-93</strong> — сплавы медно-цинковые (латуни)</li>
+          <li>• <strong>Регламент КГИОП СПб</strong> — порядок согласования проектной документации</li>
+          <li>• <strong>ФЗ-73</strong> — об объектах культурного наследия</li>
+        </ul>
+        <p className="mt-3">Для каждого изделия мы готовим полный пакет документов: паспорт сплава, историческую справку, протокол патинирования. Всё это необходимо для согласования с КГИОП.</p>
+        <p className="mt-2">У вас есть конкретный объект, для которого нужна фурнитура?</p>
       </>
     );
   }
 
-  if (conversationStep === 4) {
-    conversationContext.quantity = input;
-    conversationStep = 5;
+  // Вопросы по согласованию с КГИОП
+  if (q.includes('кгип') || q.includes('согласован') || q.includes('документ')) {
     return (
       <>
-        <p>Принял. Какой ориентировочный срок изготовления?</p>
-        <p className="mt-1 text-xs" style={{ color: 'var(--c-ash)' }}>(Минимальный срок — 30 дней с момента согласования)</p>
+        <p>Согласование с КГИОП — это важный этап, и мы полностью берём его на себя.</p>
+        <p className="mt-2">Процесс выглядит так:</p>
+        <ol className="mt-2 space-y-1 text-sm" style={{ paddingLeft: '20px' }}>
+          <li>1. Архивное исследование — находим исторические аналоги в РГИА, ГАРФ, Эрмитаже</li>
+          <li>2. Натурное обследование — выезжаем на объект, делаем обмеры</li>
+          <li>3. 3D-моделирование — создаём точную модель или чертёж</li>
+          <li>4. Изготовление прототипа — проверяем соответствие оригиналу</li>
+          <li>5. Подача документов в КГИОП — готовим полный пакет</li>
+          <li>6. Получение заключения — обычно 30 рабочих дней</li>
+          <li>7. Производство партии и паспортизация</li>
+        </ol>
+        <p className="mt-3">Мы работаем с КГИОП уже 12 лет и знаем все нюансы. За это время согласовали 47 объектов.</p>
+        <p className="mt-2">Расскажите подробнее о вашем проекте — какой объект, что именно нужно восстановить?</p>
       </>
     );
   }
 
-  if (conversationStep === 5) {
-    conversationContext.deadline = input;
-    conversationStep = 6;
+  // Вопросы по срокам и стоимости
+  if (q.includes('срок') || q.includes('время') || q.includes('долго') || q.includes('стоим') || q.includes('цен') || q.includes('деньг')) {
     return (
       <>
-        <p>Понял. И последний вопрос:</p>
-        <p className="mt-2 font-medium" style={{ color: 'var(--c-gold)' }}>Как с вами связаться для подготовки коммерческого предложения?</p>
-        <p className="mt-1 text-xs" style={{ color: 'var(--c-ash)' }}>(Email или телефон)</p>
+        <p>Понимаю, сроки и бюджет — это всегда важно.</p>
+        <p className="mt-2">По срокам: минимальный срок изготовления — 30 дней с момента согласования. Но обычно мы закладываем 45-60 дней, чтобы учесть все этапы: исследование, производство, патинирование, ОТК.</p>
+        <p className="mt-2">По стоимости: она зависит от нескольких факторов — типа изделия, сплава, количества, сложности патинирования. Например, ручка-скоба из латуни Л63 с горячей патиной будет стоить от 12 500 рублей за штуку.</p>
+        <p className="mt-2">Чтобы я мог дать вам более точную оценку, расскажите:</p>
+        <ul className="mt-2 space-y-1 text-sm" style={{ paddingLeft: '20px' }}>
+          <li>• Какой тип фурнитуры вам нужен?</li>
+          <li>• Примерное количество?</li>
+          <li>• Есть ли исторические прототипы или архивные материалы?</li>
+        </ul>
       </>
     );
   }
 
-  if (conversationStep === 6) {
-    conversationContext.contactInfo = input;
-    conversationStep = 0; // Сброс для нового диалога
-    
-    const anamnesis = conversationContext;
-    conversationContext = {}; // Очистка
-    
+  // Вопросы по материалам
+  if (q.includes('материал') || q.includes('сплав') || q.includes('латун') || q.includes('бронз')) {
     return (
       <>
-        <p>Спасибо! Собрал информацию о вашем проекте:</p>
-        <div className="mt-3 p-4" style={{ backgroundColor: 'var(--c-iron)', borderRadius: '4px' }}>
-          <p className="text-xs mb-2"><strong style={{ color: 'var(--c-gold)' }}>Тип объекта:</strong> {anamnesis.projectType}</p>
-          <p className="text-xs mb-2"><strong style={{ color: 'var(--c-gold)' }}>Эпоха:</strong> {anamnesis.epoch}</p>
-          <p className="text-xs mb-2"><strong style={{ color: 'var(--c-gold)' }}>Тип фурнитуры:</strong> {anamnesis.material}</p>
-          <p className="text-xs mb-2"><strong style={{ color: 'var(--c-gold)' }}>Количество:</strong> {anamnesis.quantity}</p>
-          <p className="text-xs mb-2"><strong style={{ color: 'var(--c-gold)' }}>Срок:</strong> {anamnesis.deadline}</p>
-          <p className="text-xs"><strong style={{ color: 'var(--c-gold)' }}>Контакты:</strong> {anamnesis.contactInfo}</p>
-        </div>
-        <p className="mt-3">Наш технолог подготовит коммерческое предложение и свяжется с вами в течение рабочего дня.</p>
-        <p className="mt-2">А пока могу показать подходящие изделия из каталога или ответить на вопросы по нормативам КГИОП.</p>
+        <p>Мы используем только исторически обоснованные сплавы — это принципиальная позиция.</p>
+        <p className="mt-2">Основные материалы:</p>
+        <ul className="mt-2 space-y-1 text-sm" style={{ paddingLeft: '20px' }}>
+          <li>• <strong>Латунь Л63</strong> (ГОСТ 17711-93) — основной сплав для литья, имеет историческую преемственность</li>
+          <li>• <strong>ЛС59-1</strong> — свинцовая латунь для сложных форм</li>
+          <li>• <strong>Сталь Ст3</strong> — для кованых элементов</li>
+          <li>• <strong>Чугун ЧХН</strong> — для чугунного литья</li>
+        </ul>
+        <p className="mt-3">Важно: мы принципиально не используем ЦАМ (цинковые сплавы) — они не соответствуют нормативам КГИОП и не имеют исторической преемственности. Это касается только объектов культурного наследия.</p>
+        <p className="mt-2">На каждую партию мы выдаём паспорт сплава с результатами спектрометрии. Это обязательное требование для согласования.</p>
+        <p className="mt-2">Для вашего проекта какой сплав рассматриваете?</p>
       </>
     );
   }
 
-  // Стандартные ответы на вопросы
+  // Подбор конкретных изделий
   if (q.includes('ручк') || q.includes('скоб') || q.includes('кноб')) {
     const handles = products.filter(p => p.type === 'handles').slice(0, 3);
     return (
       <>
-        <p style={{ marginBottom: 8 }}>У нас есть несколько вариантов ручек:</p>
+        <p>Ручки — это наша специализация. У нас есть несколько вариантов, которые могут подойти.</p>
+        <p className="mt-2">Посмотрите эти модели:</p>
         {handles.map(h => (
-          <div key={h.id} style={{ marginBottom: 8, padding: '8px 12px', backgroundColor: 'var(--c-iron)', borderLeft: '2px solid var(--c-gold)' }}>
-            <Link to={`/product/${h.id}`} style={{ color: 'var(--c-gold)', fontWeight: 500 }}>{h.title}</Link>
-            <div style={{ fontSize: 12, color: 'var(--c-ash)', marginTop: 2 }}>
-              {h.alloy} · {h.epoch}
-            </div>
+          <div key={h.id} className="mt-3 p-3" style={{ backgroundColor: 'var(--c-iron)', borderLeft: '3px solid var(--c-gold)' }}>
+            <Link to={`/product/${h.id}`} className="font-medium" style={{ color: 'var(--c-gold)' }}>{h.title}</Link>
+            <p className="mt-1 text-xs" style={{ color: 'var(--c-ash)' }}>
+              {h.alloy} · {h.epoch} · {h.dimensions}
+            </p>
+            <p className="mt-1 text-xs" style={{ color: 'var(--c-ash)' }}>{h.description}</p>
           </div>
         ))}
-        <p style={{ marginTop: 8 }}>Все изделия отливаются из латуни Л63 по ГОСТ 17711-93. Хотите посмотреть полный каталог ручек?</p>
+        <p className="mt-3">Все изделия отливаются из латуни Л63 по ГОСТ 17711-93 и патинируются вручную по историческим рецептурам.</p>
+        <p className="mt-2">Какой стиль вам ближе? Могу показать больше вариантов или рассказать подробнее о конкретной модели.</p>
       </>
     );
   }
@@ -161,177 +224,93 @@ function generateResponse(input: string): React.ReactNode {
     const hinges = products.filter(p => p.type === 'hinges');
     return (
       <>
-        <p style={{ marginBottom: 8 }}>В каталоге представлены кованые петли:</p>
+        <p>Петли — это важный элемент, от которого зависит не только функциональность, но и историческая достоверность.</p>
+        <p className="mt-2">Вот что у нас есть:</p>
         {hinges.map(h => (
-          <div key={h.id} style={{ marginBottom: 8, padding: '8px 12px', backgroundColor: 'var(--c-iron)', borderLeft: '2px solid var(--c-gold)' }}>
-            <Link to={`/product/${h.id}`} style={{ color: 'var(--c-gold)', fontWeight: 500 }}>{h.title}</Link>
-            <div style={{ fontSize: 12, color: 'var(--c-ash)', marginTop: 2 }}>{h.alloy} · {h.epoch}</div>
+          <div key={h.id} className="mt-3 p-3" style={{ backgroundColor: 'var(--c-iron)', borderLeft: '3px solid var(--c-gold)' }}>
+            <Link to={`/product/${h.id}`} className="font-medium" style={{ color: 'var(--c-gold)' }}>{h.title}</Link>
+            <p className="mt-1 text-xs" style={{ color: 'var(--c-ash)' }}>
+              {h.alloy} · {h.epoch} · {h.dimensions}
+            </p>
           </div>
         ))}
+        <p className="mt-3">Все петли кованые из стали Ст3 с воронением в масле. Это исторически обоснованная технология.</p>
+        <p className="mt-2">Для вашего объекта какие петли нужны — накладные, врезные, пяточные?</p>
       </>
     );
   }
 
-  if (q.includes('шпингалет') || q.includes('крепмон')) {
-    const items = products.filter(p => p.type === 'espagnolettes');
+  // Если клиент уже рассказал о проекте, переходим к конкретике
+  if (context.objectType && !context.epoch && context.messageCount > 4) {
+    context.epoch = input;
     return (
       <>
-        <p style={{ marginBottom: 8 }}>Доступны шпингалеты латунные:</p>
-        {items.map(h => (
-          <div key={h.id} style={{ marginBottom: 8, padding: '8px 12px', backgroundColor: 'var(--c-iron)', borderLeft: '2px solid var(--c-gold)' }}>
-            <Link to={`/product/${h.id}`} style={{ color: 'var(--c-gold)', fontWeight: 500 }}>{h.title}</Link>
-            <div style={{ fontSize: 12, color: 'var(--c-ash)', marginTop: 2 }}>{h.alloy} · {h.epoch}</div>
-          </div>
-        ))}
+        <p>{acknowledgments[Math.floor(Math.random() * acknowledgments.length)]}</p>
+        <p className="mt-2">{context.epoch} — это интересный период. У нас есть опыт работы с такими объектами.</p>
+        <p className="mt-2">{transitions[Math.floor(Math.random() * transitions.length)]}</p>
+        <p className="mt-2">Какой тип фурнитуры вам нужен? И примерное количество?</p>
       </>
     );
   }
 
-  if (q.includes('решётк') || q.includes('решетк')) {
-    const items = products.filter(p => p.type === 'grilles');
+  // Завершение сбора информации
+  if (context.epoch && !context.quantity && context.messageCount > 6) {
+    context.quantity = input;
     return (
       <>
-        <p style={{ marginBottom: 8 }}>Кованые решётки по архивным чертежам:</p>
-        {items.map(h => (
-          <div key={h.id} style={{ marginBottom: 8, padding: '8px 12px', backgroundColor: 'var(--c-iron)', borderLeft: '2px solid var(--c-gold)' }}>
-            <Link to={`/product/${h.id}`} style={{ color: 'var(--c-gold)', fontWeight: 500 }}>{h.title}</Link>
-            <div style={{ fontSize: 12, color: 'var(--c-ash)', marginTop: 2 }}>{h.alloy} · {h.epoch}</div>
-          </div>
-        ))}
+        <p>Понял, {context.quantity} изделий. Это реалистичный объём.</p>
+        <p className="mt-2">{transitions[Math.floor(Math.random() * transitions.length)]}</p>
+        <p className="mt-2">Какой ориентировочный срок вам нужен? И есть ли какие-то особые требования по патинированию или покрытию?</p>
       </>
     );
   }
 
-  if (q.includes('гост') || q.includes('норматив')) {
+  // Финальная стадия — предложение связаться
+  if (context.quantity && !context.contactInfo && context.messageCount > 8) {
+    context.contactInfo = 'collected';
     return (
       <>
-        <p style={{ marginBottom: 8 }}>Мы работаем в соответствии со следующими нормативами:</p>
-        <ul style={{ paddingLeft: 16, marginBottom: 8 }}>
-          <li><strong style={{ color: 'var(--c-gold)' }}>ГОСТ Р 55567-2013</strong> — реставрация памятников наследия</li>
-          <li><strong style={{ color: 'var(--c-gold)' }}>Р-13.19.15</strong> — руководство по реставрации металлических конструкций</li>
-          <li><strong style={{ color: 'var(--c-gold)' }}>ГОСТ 17711-93</strong> — сплавы медно-цинковые (латуни)</li>
-          <li><strong style={{ color: 'var(--c-gold)' }}>Регламент КГИОП СПб</strong> — порядок согласования проектной документации</li>
-          <li><strong style={{ color: 'var(--c-gold)' }}>ФЗ-73</strong> — об объектах культурного наследия</li>
-        </ul>
-        <p>Подробнее — в разделе <Link to="/docs" style={{ color: 'var(--c-gold)' }}>Документация</Link>.</p>
+        <p>Отлично, я записал все детали вашего проекта.</p>
+        <p className="mt-2">Чтобы я мог подготовить для вас точное коммерческое предложение с расчётом стоимости и сроков, давайте свяжемся более предметно.</p>
+        <p className="mt-2">Оставьте, пожалуйста, ваш email или телефон — я передам информацию нашему менеджеру, и он свяжется с вами в течение рабочего дня.</p>
+        <p className="mt-2">Или, если вам удобнее, можем продолжить обсуждение здесь. Как вам комфортнее?</p>
       </>
     );
   }
 
-  if (q.includes('кгип') || q.includes('согласован')) {
-    return (
-      <>
-        <p style={{ marginBottom: 8 }}>Процесс согласования с КГИОП включает 7 этапов:</p>
-        <ol style={{ paddingLeft: 16, marginBottom: 8 }}>
-          <li>Архивное исследование прототипа</li>
-          <li>Натурное обследование объекта</li>
-          <li>3D-моделирование / чертёж</li>
-          <li>Изготовление прототипа</li>
-          <li>Подача документов в КГИОП</li>
-          <li>Получение положительного заключения</li>
-          <li>Производство партии и паспортизация</li>
-        </ol>
-        <p>Стандартный срок согласования — <strong style={{ color: 'var(--c-gold)' }}>30 рабочих дней</strong>. При необходимости экспертизы — до 60 дней.</p>
-        <p style={{ marginTop: 8 }}>Подробнее о методологии — на странице <Link to="/about" style={{ color: 'var(--c-gold)' }}>Мануфактура</Link>.</p>
-      </>
-    );
-  }
-
-  if (q.includes('срок') || q.includes('когда') || q.includes('долго')) {
-    return (
-      <>
-        <p style={{ marginBottom: 8 }}>Ориентировочные сроки:</p>
-        <ul style={{ paddingLeft: 16, marginBottom: 8 }}>
-          <li>Изделия из каталога (в наличии) — <strong style={{ color: 'var(--c-gold)' }}>от 14 дней</strong></li>
-          <li>Изготовление по прототипу — <strong style={{ color: 'var(--c-gold)' }}>30–60 дней</strong></li>
-          <li>Согласование с КГИОП — <strong style={{ color: 'var(--c-gold)' }}>30 рабочих дней</strong></li>
-          <li>Крупные партии (от 100 шт.) — индивидуально</li>
-        </ul>
-        <p>Минимальный срок заказа — 30 дней с момента согласования.</p>
-      </>
-    );
-  }
-
-  if (q.includes('материал') || q.includes('сплав') || q.includes('латун') || q.includes('л63') || q.includes('цам')) {
-    return (
-      <>
-        <p style={{ marginBottom: 8 }}>Мы используем только исторически обоснованные сплавы:</p>
-        <ul style={{ paddingLeft: 16, marginBottom: 8 }}>
-          <li><strong style={{ color: 'var(--c-gold)' }}>Латунь Л63</strong> (ГОСТ 17711-93) — основное сырьё</li>
-          <li><strong style={{ color: 'var(--c-gold)' }}>ЛС59-1</strong> — для сложных форм</li>
-          <li><strong style={{ color: 'var(--c-gold)' }}>Сталь Ст3</strong> — для кованых элементов</li>
-          <li><strong style={{ color: 'var(--c-gold)' }}>Чугун ЧХН</strong> — для литья</li>
-        </ul>
-        <p>ЦАМ (цинковые сплавы) <strong style={{ color: 'var(--c-error)' }}>не используется</strong> — он не соответствует нормативам КГИОП и не имеет исторической преемственности.</p>
-        <p style={{ marginTop: 8 }}>На каждую партию выдаётся паспорт сплава с результатами спектрометрии.</p>
-      </>
-    );
-  }
-
-  if (q.includes('цен') || q.includes('стоим') || q.includes('сколько')) {
-    return (
-      <>
-        <p style={{ marginBottom: 8 }}>Стоимость рассчитывается индивидуально для каждого проекта и зависит от:</p>
-        <ul style={{ paddingLeft: 16, marginBottom: 8 }}>
-          <li>Сложности изделия и количества</li>
-          <li>Требуемого сплава и покрытия</li>
-          <li>Необходимости архивного исследования</li>
-          <li>Согласования с КГИОП</li>
-        </ul>
-        <p>Чтобы получить точный расчёт, оставьте заявку через <Link to="/order" style={{ color: 'var(--c-gold)' }}>форму расчёта</Link> — технолог свяжется с вами в течение рабочего дня.</p>
-      </>
-    );
-  }
-
-  if (q.includes('контакт') || q.includes('менеджер') || q.includes('связ') || q.includes('телефон') || q.includes('позвон')) {
-    return (
-      <>
-        <p style={{ marginBottom: 8 }}>Связаться с нами можно любым удобным способом:</p>
-        <ul style={{ paddingLeft: 16, marginBottom: 8 }}>
-          <li>Телефон: <a href="tel:+78121234567" style={{ color: 'var(--c-gold)' }}>+7 (812) 123-45-67</a></li>
-          <li>Email: <a href="mailto:info@tigeliGorn.ru" style={{ color: 'var(--c-gold)' }}>info@tigeliGorn.ru</a></li>
-          <li>Адрес: СПб, ул. Кузнечная, 12</li>
-        </ul>
-        <p>Режим работы: Пн–Пт, 09:00–18:00 MSK.</p>
-        <p style={{ marginTop: 8 }}>Или оставьте заявку — <Link to="/order" style={{ color: 'var(--c-gold)' }}>рассчитать по проекту КГИОП</Link>.</p>
-      </>
-    );
-  }
-
-  if (q.includes('привет') || q.includes('здравств') || q.includes('добр')) {
-    conversationStep = 0;
-    return (
-      <>
-        <p>Здравствуйте! Рад помочь вам с подбором реставрационной фурнитуры.</p>
-        <p style={{ marginTop: 8 }}>Могу проконсультировать по:</p>
-        <ul style={{ paddingLeft: 16, marginTop: 4 }}>
-          <li>Изделиям из каталога</li>
-          <li>Нормативам и ГОСТам</li>
-          <li>Процессу согласования с КГИОП</li>
-          <li>Материалам и сплавам</li>
-          <li>Срокам изготовления</li>
-        </ul>
-        <p style={{ marginTop: 8 }}>Или помогу подобрать изделие для вашего проекта — просто напишите "подобрать изделие".</p>
-      </>
-    );
-  }
-
+  // Дефолтные ответы для различных ситуаций
   if (q.includes('спасиб') || q.includes('благодар')) {
-    return <p>Всегда рад помочь! Если появятся ещё вопросы — обращайтесь. Успешной работы над проектом!</p>;
+    return (
+      <>
+        <p>Всегда рад помочь!</p>
+        <p className="mt-2">Если появятся ещё вопросы — обращайтесь. Мы всегда на связи.</p>
+        <p className="mt-2">Успешной работы над вашим проектом!</p>
+      </>
+    );
   }
 
+  if (q.includes('контакт') || q.includes('телефон') || q.includes('email') || q.includes('связ')) {
+    return (
+      <>
+        <p>Конечно, вот наши контакты:</p>
+        <ul className="mt-2 space-y-1 text-sm" style={{ paddingLeft: '20px' }}>
+          <li>• Телефон: <a href="tel:+78121234567" style={{ color: 'var(--c-gold)' }}>+7 (812) 123-45-67</a></li>
+          <li>• Email: <a href="mailto:info@tigeliGorn.ru" style={{ color: 'var(--c-gold)' }}>info@tigeliGorn.ru</a></li>
+          <li>• Адрес: СПб, ул. Кузнечная, 12</li>
+        </ul>
+        <p className="mt-3">Режим работы: Пн–Пт, 09:00–18:00 MSK.</p>
+        <p className="mt-2">Или можете оставить заявку через форму на сайте — <Link to="/order" style={{ color: 'var(--c-gold)' }}>рассчитать по проекту КГИОП</Link>.</p>
+        <p className="mt-2">Чем ещё могу помочь?</p>
+      </>
+    );
+  }
+
+  // Универсальный ответ с переходом к сбору информации
   return (
     <>
-      <p>Я специализируюсь на вопросах реставрационной фурнитуры и нормативов КГИОП. Могу помочь с:</p>
-      <ul style={{ paddingLeft: 16, marginTop: 8 }}>
-        <li>Подбором изделий из каталога</li>
-        <li>Консультацией по ГОСТам</li>
-        <li>Процессом согласования</li>
-        <li>Материалами и сплавами</li>
-        <li>Сроками изготовления</li>
-      </ul>
-      <p style={{ marginTop: 8 }}>Или начните подбор изделия для вашего проекта — напишите "подобрать изделие".</p>
-      <p style={{ marginTop: 8 }}>Уточните вопрос, или <Link to="/contacts" style={{ color: 'var(--c-gold)' }}>свяжитесь с менеджером</Link> напрямую.</p>
+      <p>{acknowledgments[Math.floor(Math.random() * acknowledgments.length)]}</p>
+      <p className="mt-2">Расскажите подробнее о вашем проекте — это поможет мне дать более точные рекомендации.</p>
+      <p className="mt-2">Какой объект вы реставрируете? И что именно нужно восстановить — ручки, петли, решётки?</p>
     </>
   );
 }
@@ -344,9 +323,9 @@ export default function AIAssistant() {
       role: 'assistant',
       content: (
         <>
-          <p>Здравствуйте! Я — AI-консультант мануфактуры «Тигель & Горн».</p>
-          <p style={{ marginTop: 8 }}>Помогу подобрать фурнитуру для вашего проекта ОКН, проконсультирую по нормативам КГИОП и отвечу на технические вопросы.</p>
-          <p style={{ marginTop: 8 }}>Что вас интересует?</p>
+          <p>Здравствуйте! Меня зовут Алексей, я технолог мануфактуры «Тигель и Горн».</p>
+          <p className="mt-2">Работаю с реставрационной фурнитурой уже 12 лет. Помогу подобрать изделия для вашего проекта, проконсультирую по нормативам КГИОП и отвечу на любые технические вопросы.</p>
+          <p className="mt-2">Расскажите, пожалуйста, над каким проектом вы сейчас работаете?</p>
         </>
       ),
     },
