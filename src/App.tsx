@@ -74,7 +74,8 @@ function App() {
               <ProtectedRoute>
                 <CMS />
               </ProtectedRoute>
-            } />            </Routes>
+            } />
+            </Routes>
           </main>
           <Footer />
           <AIAssistant />
