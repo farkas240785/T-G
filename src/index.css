@@ -1,0 +1,345 @@
+@import "tailwindcss";
+
+:root {
+  /* ═══════════════════════════════════════════════════════════════
+     ТЁМНАЯ ПАЛИТРА: УГОЛЬ И МЕТАЛЛ
+     Многослойная темнота с тёплым подтоном кузнечного горна
+     ═══════════════════════════════════════════════════════════════ */
+  --c-void: #08070A;              /* Абсолютная тьма — фон hero, футер */
+  --c-coal: #0C0B0E;              /* Глубокий уголь — основной фон */
+  --c-charcoal: #131216;          /* Древесный уголь — секции */
+  --c-iron: #1B1A1F;              /* Чугун — карточки */
+  --c-steel: #252429;             /* Сталь — hover, границы */
+  --c-slate: #323038;             /* Сланец — активные элементы */
+
+  /* ═══════════════════════════════════════════════════════════════
+     ЗОЛОТАЯ ПАЛИТРА: БЛАГОРОДНЫЙ МЕТАЛЛ
+     Оттенки настоящего золота 750 пробы с красноватым подтоном
+     ═══════════════════════════════════════════════════════════════ */
+  --c-gold-deep: #8B6914;         /* Глубокое золото — акценты, границы */
+  --c-gold: #B8860B;              /* Классическое золото — основной акцент */
+  --c-gold-rich: #D4A017;         /* Насыщенное золото — заголовки, active */
+  --c-gold-light: #E8C547;        /* Светлое золото — hover, свечение */
+  --c-gold-pale: #F0D97A;         /* Бледное золото — тонкие детали */
+  --c-gold-glow: rgba(212, 160, 23, 0.15); /* Свечение золота */
+
+  /* ═══════════════════════════════════════════════════════════════
+     ЛАТУННАЯ ПАЛИТРА: ТЕПЛО МАСТЕРСКОЙ
+     Вторичные акценты и декоративные элементы
+     ═══════════════════════════════════════════════════════════════ */
+  --c-brass: #A0845C;             /* Латунь */
+  --c-brass-light: #C4A87A;       /* Светлая латунь */
+  --c-brass-dark: #6B5A3E;        /* Тёмная латунь */
+
+  /* ═══════════════════════════════════════════════════════════════
+     ТЕКСТ НА ТЁМНОМ ФОНЕ
+     Чёткая иерархия читаемости
+     ═══════════════════════════════════════════════════════════════ */
+  --c-parchment: #E8E2D4;         /* Пергамент — основной текст */
+  --c-ash: #A8A094;               /* Пепел — вторичный текст */
+  --c-smoke: #6B6560;             /* Дым — приглушённый текст */
+  --c-soot: #3D3A36;              /* Сажа — тусклый текст */
+
+  /* ═══════════════════════════════════════════════════════════════
+     ЛИНИИ И ГРАНИЦЫ
+     ═══════════════════════════════════════════════════════════════ */
+  --c-rule: #1F1E23;              /* Тонкие линии */
+  --c-rule-light: #2A2830;        /* Светлые линии */
+  --c-rule-gold: rgba(184, 134, 11, 0.3); /* Золотые линии */
+
+  /* ═══════════════════════════════════════════════════════════════
+     СТАТУСЫ
+     ═══════════════════════════════════════════════════════════════ */
+  --c-patina: #5A7A5E;            /* Зелёная патина — согласовано */
+  --c-patina-light: #7A9A7E;      /* Светлая патина */
+  --c-ember: #C45A3C;             /* Тлеющий уголь — предупреждение */
+  --c-error: #A63D2F;             /* Ошибка */
+
+  /* ═══════════════════════════════════════════════════════════════
+     ТИПОГРАФИКА
+     ═══════════════════════════════════════════════════════════════ */
+  --f-display: 'EB Garamond', Georgia, serif;
+  --f-body: 'Source Sans 3', system-ui, sans-serif;
+  --f-mono: 'IBM Plex Mono', monospace;
+
+  /* ═══════════════════════════════════════════════════════════════
+     АЛИАСЫ ДЛЯ СОВМЕСТИМОСТИ
+     ═══════════════════════════════════════════════════════════════ */
+  --c-forge: var(--c-gold);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   БАЗОВЫЕ СТИЛИ
+   ═══════════════════════════════════════════════════════════════ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--f-body);
+  color: var(--c-parchment);
+  background-color: var(--c-coal);
+  line-height: 1.6;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+a { color: inherit; text-decoration: none; transition: color 0.3s ease; }
+a:hover { color: var(--c-gold-rich); }
+
+::selection {
+  background: var(--c-gold);
+  color: var(--c-coal);
+}
+
+.container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+@media (max-width: 768px) {
+  .container { padding: 0 16px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ДОСТУПНОСТЬ
+   ═══════════════════════════════════════════════════════════════ */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: var(--c-gold);
+  color: var(--c-coal);
+  padding: 12px 24px;
+  z-index: 100;
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.skip-link:focus { top: 0; }
+
+*:focus-visible {
+  outline: 2px solid var(--c-gold-rich);
+  outline-offset: 3px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   СКРОЛЛБАР
+   ═══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--c-coal); }
+::-webkit-scrollbar-thumb { background: var(--c-steel); }
+::-webkit-scrollbar-thumb:hover { background: var(--c-gold-deep); }
+
+/* ═══════════════════════════════════════════════════════════════
+   БАЗОВАЯ ТИПОГРАФИКА
+   ═══════════════════════════════════════════════════════════════ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   УТИЛИТЫ: МЕТКИ
+   ═══════════════════════════════════════════════════════════════ */
+.label {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--c-smoke);
+}
+
+.label-gold, .label-forge {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ГРАДИЕНТЫ РАСПЛАВЛЕННОГО ЗОЛОТА
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Горизонтальный градиент с угасанием по краям */
+.forge-gradient {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--c-gold-deep) 20%,
+    var(--c-gold-rich) 50%,
+    var(--c-gold-deep) 80%,
+    transparent 100%
+  );
+}
+
+/* Интенсивный диагональный градиент */
+.forge-gradient-intense {
+  background: linear-gradient(
+    135deg,
+    var(--c-gold-deep) 0%,
+    var(--c-gold) 25%,
+    var(--c-gold-rich) 50%,
+    var(--c-gold-light) 75%,
+    var(--c-gold) 100%
+  );
+}
+
+/* Градиентный текст — золото */
+.forge-text {
+  background: linear-gradient(
+    135deg,
+    var(--c-gold-light) 0%,
+    var(--c-gold-rich) 40%,
+    var(--c-gold) 70%,
+    var(--c-brass-light) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   СВЕЧЕНИЕ РАСКАЛЁННОГО МЕТАЛЛА
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Свечение раскалённого металла */
+.ember-glow {
+  box-shadow:
+    0 0 80px rgba(184, 134, 11, 0.12),
+    0 0 160px rgba(184, 134, 11, 0.06),
+    inset 0 0 60px rgba(184, 134, 11, 0.04);
+}
+
+/* Мягкое золотое свечение */
+.gold-glow-soft {
+  box-shadow:
+    0 0 40px rgba(184, 134, 11, 0.08),
+    0 0 80px rgba(184, 134, 11, 0.04);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   КНОПКИ
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Основная кнопка — золотой градиент */
+.btn-forge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 40px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.4s ease;
+  cursor: pointer;
+  border: none;
+  background: linear-gradient(135deg, var(--c-gold-deep), var(--c-gold), var(--c-gold-rich));
+  color: var(--c-coal);
+  box-shadow: 0 4px 20px rgba(184, 134, 11, 0.2);
+}
+.btn-forge:hover {
+  background: linear-gradient(135deg, var(--c-gold), var(--c-gold-rich), var(--c-gold-light));
+  box-shadow:
+    0 4px 30px rgba(184, 134, 11, 0.35),
+    0 0 60px rgba(184, 134, 11, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Контурная кнопка — светлая */
+.btn-outline-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 40px;
+  background: transparent;
+  color: var(--c-parchment);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid var(--c-steel);
+  transition: all 0.4s ease;
+  cursor: pointer;
+}
+.btn-outline-light:hover {
+  border-color: var(--c-gold);
+  color: var(--c-gold-rich);
+  box-shadow: 0 0 30px rgba(184, 134, 11, 0.1);
+}
+
+/* Ссылка с золотым подчёркиванием */
+.link-forge {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: all 0.3s ease;
+}
+.link-forge:hover {
+  border-color: var(--c-gold-rich);
+  color: var(--c-gold-light);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   КАРТОЧКИ
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Тёмная карточка с hover-эффектом */
+.card-dark {
+  background: var(--c-iron);
+  border: 1px solid var(--c-rule-light);
+  transition: all 0.5s ease;
+}
+.card-dark:hover {
+  border-color: var(--c-gold-deep);
+  box-shadow:
+    0 0 40px rgba(184, 134, 11, 0.06),
+    0 20px 60px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ТЕКСТУРА УГЛЯ С ЗОЛОТЫМИ ОТБЛЕСКАМИ
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Текстура угля */
+.coal-texture {
+  background-image:
+    radial-gradient(ellipse at 15% 20%, rgba(184, 134, 11, 0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 80%, rgba(184, 134, 11, 0.03) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 50%, rgba(139, 105, 20, 0.02) 0%, transparent 60%);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ЗОЛОТАЯ ЛИНИЯ С УГАСАНИЕМ
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Золотая линия */
+.gold-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--c-gold-deep) 15%,
+    var(--c-gold) 50%,
+    var(--c-gold-deep) 85%,
+    transparent 100%
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ПЕЧАТЬ
+   ═══════════════════════════════════════════════════════════════ */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; color: black; }
+}
